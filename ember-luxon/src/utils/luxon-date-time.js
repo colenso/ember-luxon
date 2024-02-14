@@ -28,6 +28,7 @@ export default class LuxonDateTime {
 
   format(formatString) {
     if (isBlank(formatString)) return this.dateTime.toISO();
+    if (formatString === 'LL') return this.dateTime.toLocaleString(DateTime.DATE_FULL);
     return this.dateTime.toFormat(formatString);
   }
 }
