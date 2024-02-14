@@ -65,6 +65,8 @@ export default class LuxonDateTime {
         luxonFormatString = formatStringCopy;
     }
     if (shouldStripTimeZone) {
+      tZCharacter =
+        tZCharacter === 'z' ? 'ZZZZ' : tZCharacter === 'Z' ? 'ZZ' : tZCharacter;
       return this.dateTime.toFormat(`${luxonFormatString} ${tZCharacter}`);
     }
     return this.dateTime.toFormat(luxonFormatString);
