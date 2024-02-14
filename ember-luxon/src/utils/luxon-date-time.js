@@ -28,25 +28,45 @@ export default class LuxonDateTime {
 
   format(formatString) {
     if (isBlank(formatString)) return this.dateTime.toISO();
-    switch (formatString) {
-      case 'L':
-        return this.dateTime.toFormat('MM/dd/yyyy');
-      case 'l':
-        return this.dateTime.toFormat('M/d/yyyy');
-      case 'LL':
-        return this.dateTime.toFormat('MMMM d, yyyy');
-      case 'll':
-        return this.dateTime.toFormat('MMM d, yyyy');
-      case 'LLL':
-        return this.dateTime.toFormat('MMMM d, yyyy h:mm a');
-      case 'lll':
-        return this.dateTime.toFormat('MMM d, yyyy h:mm a');
-      case 'LLLL':
-        return this.dateTime.toFormat('EEEE, MMMM d, yyyy h:mm a');
-      case 'llll':
-        return this.dateTime.toFormat('EEE, MMM d, yyyy h:mm a');
-      default:
-        return this.dateTime.toFormat(formatString);
+    let formatStringCopy = formatString;
+    let tZCharacter
+    const shouldStripTimeZone = formatStringCopy.toLowerCase().endsWith(' z');
+    if (shouldStripTimeZone) {
+      tZCharacter = formatString[formatString.length - 1];
+      formatStringCopy = formatStringCopy.slice(0, -2);
     }
+    let luxonFormatString;
+    switch (formatStringCopy) {
+      case 'L':
+        luxonFormatString = 'MM/dd/yyyy';
+        break;
+      case 'l':
+        luxonFormatString = 'M/d/yyyy';
+        break;
+      case 'LL':
+        luxonFormatString = 'MMMM d, yyyy';
+        break;
+      case 'll':
+        luxonFormatString = 'MMM d, yyyy';
+        break;
+      case 'LLL':
+        luxonFormatString = 'MMMM d, yyyy h:mm a';
+        break;
+      case 'lll':
+        luxonFormatString = 'MMM d, yyyy h:mm a';
+        break;
+      case 'LLLL':
+        luxonFormatString = 'EEEE, MMMM d, yyyy h:mm a';
+        break;
+      case 'llll':
+        luxonFormatString = 'EEE, MMM d, yyyy h:mm a';
+        break;
+      default:
+        luxonFormatString = formatStringCopy;
+    }
+    if (shouldStripTimeZone) {
+      return this.dateTime.toFormat(`${luxonFormatString} ${tZCharacter}`);
+    }
+    return this.dateTime.toFormat(luxonFormatString);
   }
 }
