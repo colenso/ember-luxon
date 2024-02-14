@@ -3,7 +3,7 @@ import { isBlank } from '@ember/utils';
 import { DateTime } from 'luxon';
 
 function parseDateTime(dateTime, fromFormat = null) {
-  if (isBlank(dateTime)) return DateTime.now();
+  if (isBlank(dateTime)) return DateTime.local();
   if (fromFormat) {
     return DateTime.fromFormat(dateTime, fromFormat);
   }
@@ -28,7 +28,25 @@ export default class LuxonDateTime {
 
   format(formatString) {
     if (isBlank(formatString)) return this.dateTime.toISO();
-    if (formatString === 'LL') return this.dateTime.toLocaleString(DateTime.DATE_FULL);
-    return this.dateTime.toFormat(formatString);
+    switch (formatString) {
+      case 'L':
+        return this.dateTime.toFormat('MM/dd/yyyy');
+      case 'l':
+        return this.dateTime.toFormat('M/d/yyyy');
+      case 'LL':
+        return this.dateTime.toFormat('MMMM d, yyyy');
+      case 'll':
+        return this.dateTime.toFormat('MMM d, yyyy');
+      case 'LLL':
+        return this.dateTime.toFormat('MMMM d, yyyy h:mm a');
+      case 'lll':
+        return this.dateTime.toFormat('MMM d, yyyy h:mm a');
+      case 'LLLL':
+        return this.dateTime.toFormat('EEEE, MMMM d, yyyy h:mm a');
+      case 'llll':
+        return this.dateTime.toFormat('EEE, MMM d, yyyy h:mm a');
+      default:
+        return this.dateTime.toFormat(formatString);
+    }
   }
 }
