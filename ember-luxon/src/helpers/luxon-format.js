@@ -37,7 +37,7 @@ export default class LuxonFormatHelper extends BaseHelper {
       formatArgs.push(params[1]);
     }
 
-    return this.morphMoment(luxon.luxon(...args), {
+    return this.morphLuxon(luxon.luxon(...args), {
       locale,
       timeZone,
     }).format(...formatArgs);
