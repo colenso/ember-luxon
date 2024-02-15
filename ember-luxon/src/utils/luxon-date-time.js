@@ -33,6 +33,20 @@ function parseDateTime(dateTime, fromFormat = null) {
   return parsedDateTime;
 }
 
+function ordinal(day) {
+  if (day > 3 && day < 21) return 'th';
+  switch (day % 10) {
+    case 1:
+      return 'st';
+    case 2:
+      return 'nd';
+    case 3:
+      return 'rd';
+    default:
+      return 'th';
+  }
+}
+
 export default class LuxonDateTime {
   @tracked dateTime;
 
@@ -49,39 +63,33 @@ export default class LuxonDateTime {
       tZCharacter = formatString[formatString.length - 1];
       formatStringCopy = formatStringCopy.slice(0, -2);
     }
-    let luxonFormatString;
-    switch (formatStringCopy) {
-      case 'L':
-        luxonFormatString = 'MM/dd/yyyy';
-        break;
-      case 'l':
-        luxonFormatString = 'M/d/yyyy';
-        break;
-      case 'LL':
-        luxonFormatString = 'MMMM d, yyyy';
-        break;
-      case 'll':
-        luxonFormatString = 'MMM d, yyyy';
-        break;
-      case 'LLL':
-        luxonFormatString = 'MMMM d, yyyy h:mm a';
-        break;
-      case 'lll':
-        luxonFormatString = 'MMM d, yyyy h:mm a';
-        break;
-      case 'LLLL':
-        luxonFormatString = 'EEEE, MMMM d, yyyy h:mm a';
-        break;
-      case 'llll':
-        luxonFormatString = 'EEE, MMM d, yyyy h:mm a';
-        break;
-      default:
-        luxonFormatString = formatStringCopy;
-    }
+    formatStringCopy = formatStringCopy.replace(
+      'llll',
+      'EEE, MMM d, yyyy h:mm a',
+    );
+    formatStringCopy = formatStringCopy.replace(
+      'LLLL',
+      'EEEE, MMMM d, yyyy h:mm a',
+    );
+    formatStringCopy = formatStringCopy.replace('lll', 'MMM d, yyyy h:mm a');
+    formatStringCopy = formatStringCopy.replace('LLL', 'MMMM d, yyyy h:mm a');
+    formatStringCopy = formatStringCopy.replace('ll', 'MMM d, yyyy');
+    formatStringCopy = formatStringCopy.replace('LL', 'MMMM d, yyyy');
+    formatStringCopy = formatStringCopy.replace('l', 'M/d/yyyy');
+    formatStringCopy = formatStringCopy.replace('L', 'MM/dd/yyyy');
+    formatStringCopy = formatStringCopy.replace('ddd', 'EEE');
     if (shouldStripTimeZone && this.dateTime.hadTimeZone) {
-      tZCharacter = tZCharacter === 'z' ? 'ZZZZ' : tZCharacter === 'Z' ? 'ZZ' : tZCharacter;
-      return this.dateTime.toFormat(`${luxonFormatString} ${tZCharacter}`);
+      tZCharacter =
+        tZCharacter === 'z' ? 'ZZZZ' : tZCharacter === 'Z' ? 'ZZ' : tZCharacter;
+      let formattedStr = this.dateTime.toFormat(
+        `${formatStringCopy} ${tZCharacter}`,
+      );
+      if (formattedStr.includes('Do')) {
+        const day = this.dateTime.day;
+        return formattedStr.replace('Do', `${day}${ordinal(day)}`);
+      }
+      return formattedStr;
     }
-    return this.dateTime.toFormat(luxonFormatString);
+    return this.dateTime.toFormat(formatStringCopy);
   }
 }
